@@ -1,11 +1,9 @@
 import streamlit as st
-from bs4 import BeautifulSoup
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
 import requests
 import re
 import jieba
-from wordcloud import WordCloud
-import matplotlib.pyplot as plt
-import numpy as np
 
 def main():
     st.title('Bilibili DanMu Word Cloud')
@@ -39,21 +37,29 @@ def main():
     DanMu_text = ' '.join(DanMu_list)
 
     # 分词
-    words = jieba.lcut(DanMu_text)
+    words = ' '.join(jieba.lcut(DanMu_text))
 
     # 设置词云图的宽度和高度
     word_cloud_width = 800  # 宽度，单位为像素
     word_cloud_height = 600  # 高度，单位为像素
-    
+
     # 生成词云图
-    wordcloud = WordCloud(font_path='SIMHEI.TTF', background_color='white', max_words=100, max_font_size=100).generate(' '.join(words))
+    wordcloud = WordCloud(font_path='./SIMHEI.TTF',  # 确保路径正确
+                           width=word_cloud_width,
+                           height=word_cloud_height,
+                           background_color='white', 
+                           max_words=100, 
+                           max_font_size=100).generate(words)
 
     # 显示词云图
-    fig = plt.figure(figsize=(10, 8), facecolor=None)
-    plt.imshow(wordcloud)
+    # 使用原始大小的DPI以避免图像模糊
+    plt.figure(dpi=72, figsize=(word_cloud_width / 72, word_cloud_height / 72))
+    plt.imshow(wordcloud, interpolation='bicubic')  # 使用 bicubic 插值以提高图像质量
     plt.axis("off")
     plt.tight_layout(pad=0)
-    st.pyplot(fig)
+
+    # 显示图表
+    st.pyplot(plt)
 
 if __name__ == "__main__":
     main()
