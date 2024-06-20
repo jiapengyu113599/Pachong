@@ -49,25 +49,25 @@ def main():
     # 获取最常见的词和它们的频率
     most_common_words = word_counts.most_common(10)  # 这里取最常见的10个词
 
-    # 设置matplotlib字体为中文
-    plt.rcParams['font.sans-serif'] = ['SIMHEI']  # 指定默认字体名称，注意字体名称不包括文件扩展名
-    plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
-
-    # 使用FontProperties指定字体文件路径
+    # 绘制条形图之前，设置字体
     font_path = "./SIMHEI.TTF"  # 确保这里是字体文件的相对路径或绝对路径
     chinese_font = FontProperties(fname=font_path)
 
-    # 绘制条形图
     words, counts = zip(*most_common_words)  # 解包最常见的词和它们的频率
     plt.figure(figsize=(10, 6))
     plt.barh(words, counts, color='skyblue')
-    plt.xlabel('Frequency', fontproperties=chinese_font)  # 应用指定的中文字体
-    plt.ylabel('Words', fontproperties=chinese_font)
-    plt.title('Top 10 Most Common Words in DanMu', fontproperties=chinese_font)
 
-    # 将图表转换为图片并展示在Streamlit中
-    plt_image = plt.gcf()
-    st.pyplot(plt_image)
+    # 直接使用FontProperties设置中文
+    plt.xlabel('频率', fontproperties=chinese_font)
+    plt.ylabel('词语', fontproperties=chinese_font)
+    plt.title('弹幕词频统计', fontproperties=chinese_font)
+
+    # 保存图表为临时图片文件
+    plt.savefig('temp_plot.png')
+
+    # 展示图表
+    st.image('temp_plot.png', use_column_width=True)
 
 if __name__ == "__main__":
     main()
+
