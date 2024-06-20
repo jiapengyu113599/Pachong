@@ -5,8 +5,8 @@ import jieba
 from collections import Counter
 import matplotlib.pyplot as plt
 
-plt.rcParams['font.sans-serif'] = ['SimHei']  # 指定默认字体
-plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
+# 导入字体设置
+from matplotlib.font_manager import FontProperties
 
 def main():
     st.title('Bilibili DanMu Word Frequency')
@@ -48,14 +48,21 @@ def main():
     # 获取最常见的词和它们的频率
     most_common_words = word_counts.most_common(10)  # 这里取最常见的10个词
 
+    # 设置matplotlib字体为中文
+    plt.rcParams['font.sans-serif'] = ['SimHei']  # 指定默认字体
+    plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
+
     # 绘制条形图
     words, counts = zip(*most_common_words)  # 解包最常见的词和它们的频率
     plt.figure(figsize=(10, 6))
     plt.barh(words, counts, color='skyblue')
-    plt.xlabel('Frequency')
-    plt.ylabel('Words')
-    plt.title('Top 10 Most Common Words in DanMu')
-    st.pyplot(plt)
+    plt.xlabel('Frequency', fontsize=12)  # 指定字体大小
+    plt.ylabel('Words', fontsize=12)
+    plt.title('Top 10 Most Common Words in DanMu', fontsize=14)
+
+    # 将图表转换为图片并展示在Streamlit中
+    plt_image = plt.gcf()  # 获取当前图表对象
+    st.pyplot(plt_image)
 
 if __name__ == "__main__":
     main()
