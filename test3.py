@@ -4,6 +4,7 @@ import re
 import jieba
 from collections import Counter
 import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
 
 def main():
     st.title('Bilibili DanMu Word Frequency')
@@ -27,7 +28,7 @@ def main():
         st.error(f"请求失败，状态码：{response.status_code}")
         return
     
-    html_doc = response.content.decode('utf-8')
+    html_doc = response.content.decode('utf-8', errors='ignore')  # 添加errors='ignore'以忽略编码错误
 
     # 弹幕匹配
     format = re.compile(r'<d.*?>(.*?)</d>')
@@ -45,6 +46,10 @@ def main():
     # 获取最常见的词和它们的频率
     most_common_words = word_counts.most_common(10)  # 这里取最常见的10个词
 
+    # 设置中文字体
+    plt.rcParams['font.sans-serif'] = ['SimHei']  # 指定默认字体为SimHei
+    plt.rcParams['axes.unicode_minus'] = False  # 正确显示负号
+
     # 绘制条形图
     words, counts = zip(*most_common_words)  # 解包最常见的词和它们的频率
     plt.figure(figsize=(10, 6))
@@ -52,6 +57,8 @@ def main():
     plt.xlabel('Frequency')
     plt.ylabel('Words')
     plt.title('Top 10 Most Common Words in DanMu')
+
+    # 显示图表
     st.pyplot(plt)
 
 if __name__ == "__main__":
