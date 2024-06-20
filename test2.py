@@ -41,6 +41,10 @@ def main():
     # 分词
     words = jieba.lcut(DanMu_text)
 
+    # 设置词云图的宽度和高度
+    word_cloud_width = 800  # 宽度，单位为像素
+    word_cloud_height = 600  # 高度，单位为像素
+    
     # 生成词云图
     wordcloud = WordCloud(font_path='SIMHEI.TTF', background_color='white', max_words=100, max_font_size=100).generate(' '.join(words))
 
