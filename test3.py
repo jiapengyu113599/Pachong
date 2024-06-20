@@ -53,15 +53,18 @@ def main():
     # 绘制条形图
     plt.figure(figsize=(10, 6))
     bars = plt.barh(range(len(most_common_words)), [count for _, count in most_common_words], color='skyblue')
-    
-    # 绘制文本注释
-    for bar, (word, count) in zip(bars, most_common_words):
-        plt.text(bar.get_width()/2, bar.get_y() + bar.get_height()/2, f'{count}', va='center', ha='center', fontproperties=font_prop, color='black')
-    
+
+    # 设置y轴刻度标签为弹幕文字
+    plt.yticks(range(len(most_common_words)), [word for word, _ in most_common_words])
+
+    # 在每个条形上添加文字
+    for i, (word, count) in enumerate(most_common_words):
+        plt.text(0, i, f'{count}', va='center', ha='right', fontproperties=font_prop, color='black')
+
     plt.xlabel('Frequency', fontproperties=font_prop)
     plt.ylabel('Words', fontproperties=font_prop)
     plt.title('Top 10 Most Common Words in DanMu', fontproperties=font_prop)
-    
+
     # 显示图表
     plt.tight_layout()  # 确保布局适合显示中文
     st.pyplot(plt)
