@@ -5,6 +5,9 @@ import jieba
 from collections import Counter
 import matplotlib.pyplot as plt
 
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 指定默认字体
+plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
+
 def main():
     st.title('Bilibili DanMu Word Frequency')
 
