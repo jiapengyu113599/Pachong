@@ -49,25 +49,28 @@ def main():
     # 获取最常见的词和它们的频率
     most_common_words = word_counts.most_common(10)  # 这里取最常见的10个词
 
-    # 绘制条形图之前，设置字体
-    font_path = "./SIMHEI.TTF"  # 确保这里是字体文件的相对路径或绝对路径
-    chinese_font = FontProperties(fname=font_path)
-
+    # 绘制条形图
     words, counts = zip(*most_common_words)  # 解包最常见的词和它们的频率
-    plt.figure(figsize=(10, 6))
-    plt.barh(words, counts, color='skyblue')
+    fig, ax = plt.subplots(figsize=(10, 6))
 
-    # 直接使用FontProperties设置中文
-    plt.xlabel('频率', fontproperties=chinese_font)
-    plt.ylabel('词语', fontproperties=chinese_font)
-    plt.title('弹幕词频统计', fontproperties=chinese_font)
+    # 绘制条形图
+    bars = ax.barh(words, counts, color='skyblue')
 
-    # 保存图表为临时图片文件
-    plt.savefig('temp_plot.png')
+    # 设置中文字体
+    font_path = "./SIMHEI.TTF"  # 确保这里是字体文件的相对路径或绝对路径
+    chinese_font = FontProperties(fname=font_path, size=10)  # 可以调整字体大小
 
-    # 展示图表
-    st.image('temp_plot.png', use_column_width=True)
+    # 设置x轴和y轴的标签
+    ax.set_xlabel('频率', fontproperties=chinese_font)
+    ax.set_ylabel('词语', fontproperties=chinese_font)
+    ax.set_title('弹幕词频统计', fontproperties=chinese_font)
+
+    # 单独设置y轴标签的字体
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label1.set_fontproperties(chinese_font)
+
+    # 显示图表
+    st.pyplot(fig)
 
 if __name__ == "__main__":
     main()
-
