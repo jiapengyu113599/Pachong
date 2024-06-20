@@ -47,7 +47,7 @@ def main():
     most_common_words = word_counts.most_common(10)  # 这里取最常见的10个词
 
     # 设置中文字体
-    plt.rcParams['font.sans-serif'] = ['SimHei']  # 指定默认字体为SimHei
+    plt.rcParams['font.sans-serif'] = ['SIMHEI']  # 指定默认字体为SimHei
     plt.rcParams['axes.unicode_minus'] = False  # 正确显示负号
 
     # 绘制条形图
