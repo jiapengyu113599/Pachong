@@ -4,7 +4,7 @@ import re
 import jieba
 from collections import Counter
 import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties, _font_manager
+from matplotlib.font_manager import FontProperties
 
 def main():
     st.title('Bilibili DanMu Word Frequency')
@@ -47,21 +47,21 @@ def main():
     most_common_words = word_counts.most_common(10)
 
     # 注册字体
-    font_path = 'SIMHEI.TTF'  # 指定字体文件路径
-    _font_manager._rebuild()  # 清除缓存
+    font_path = 'SIMHEI.TTF'  # 确保这个路径是正确的
     font_prop = FontProperties(fname=font_path)
 
     # 绘制条形图
     plt.figure(figsize=(10, 6))
     bars = plt.barh(range(len(most_common_words)), [count for _, count in most_common_words], color='skyblue')
-    for bar, (word, count) in zip(bars, most_common_words):
-        plt.text(bar.get_width(), bar.get_y() + bar.get_height() / 2, f'{word}\n{count}', va='center', fontproperties=font_prop)
+    for i, (word, count) in enumerate(most_common_words):
+        plt.text(counts[i], i, f'{word}\n{count}', va='center', fontproperties=font_prop, color='black')
 
-    plt.xlabel('Frequency')
-    plt.ylabel('Words')
-    plt.title('Top 10 Most Common Words in DanMu')
+    plt.xlabel('Frequency', fontproperties=font_prop)
+    plt.ylabel('Words', fontproperties=font_prop)
+    plt.title('Top 10 Most Common Words in DanMu', fontproperties=font_prop)
 
     # 显示图表
+    plt.tight_layout()  # 确保布局适合显示中文
     st.pyplot(plt)
 
 if __name__ == "__main__":
