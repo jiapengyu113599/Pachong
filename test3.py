@@ -4,7 +4,7 @@ import re
 import jieba
 from collections import Counter
 import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties
+from matplotlib.font_manager import FontProperties, _font_manager
 
 def main():
     st.title('Bilibili DanMu Word Frequency')
@@ -28,7 +28,7 @@ def main():
         st.error(f"请求失败，状态码：{response.status_code}")
         return
     
-    html_doc = response.content.decode('utf-8', errors='ignore')  # 添加errors='ignore'以忽略编码错误
+    html_doc = response.content.decode('utf-8', errors='ignore')
 
     # 弹幕匹配
     format = re.compile(r'<d.*?>(.*?)</d>')
@@ -44,16 +44,19 @@ def main():
     word_counts = Counter(words)
 
     # 获取最常见的词和它们的频率
-    most_common_words = word_counts.most_common(10)  # 这里取最常见的10个词
+    most_common_words = word_counts.most_common(10)
 
-    # 设置中文字体
-    plt.rcParams['font.sans-serif'] = ['SIMHEI']  # 指定默认字体为SimHei
-    plt.rcParams['axes.unicode_minus'] = False  # 正确显示负号
+    # 注册字体
+    font_path = 'SIMHEI.TTF'  # 指定字体文件路径
+    _font_manager._rebuild()  # 清除缓存
+    font_prop = FontProperties(fname=font_path)
 
     # 绘制条形图
-    words, counts = zip(*most_common_words)  # 解包最常见的词和它们的频率
     plt.figure(figsize=(10, 6))
-    plt.barh(words, counts, color='skyblue')
+    bars = plt.barh(range(len(most_common_words)), [count for _, count in most_common_words], color='skyblue')
+    for bar, (word, count) in zip(bars, most_common_words):
+        plt.text(bar.get_width(), bar.get_y() + bar.get_height() / 2, f'{word}\n{count}', va='center', fontproperties=font_prop)
+
     plt.xlabel('Frequency')
     plt.ylabel('Words')
     plt.title('Top 10 Most Common Words in DanMu')
