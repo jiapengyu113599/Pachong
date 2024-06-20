@@ -4,6 +4,7 @@ import re
 import jieba
 from collections import Counter
 import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
 
 # 导入字体设置
 from matplotlib.font_manager import FontProperties
@@ -49,20 +50,27 @@ def main():
     most_common_words = word_counts.most_common(10)  # 这里取最常见的10个词
 
     # 设置matplotlib字体为中文
-    plt.rcParams['font.sans-serif'] = ['SimHei']  # 指定默认字体
+    plt.rcParams['font.sans-serif'] = ['SIMHEI']  # 指定默认字体名称，注意字体名称不包括文件扩展名
     plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
+
+    # 使用FontProperties指定字体文件路径
+    font_path = "./SIMHEI.TTF"  # 确保这里是字体文件的相对路径或绝对路径
+    chinese_font = FontProperties(fname=font_path)
 
     # 绘制条形图
     words, counts = zip(*most_common_words)  # 解包最常见的词和它们的频率
     plt.figure(figsize=(10, 6))
     plt.barh(words, counts, color='skyblue')
-    plt.xlabel('Frequency', fontsize=12)  # 指定字体大小
-    plt.ylabel('Words', fontsize=12)
-    plt.title('Top 10 Most Common Words in DanMu', fontsize=14)
+    plt.xlabel('Frequency', fontproperties=chinese_font)  # 应用指定的中文字体
+    plt.ylabel('Words', fontproperties=chinese_font)
+    plt.title('Top 10 Most Common Words in DanMu', fontproperties=chinese_font)
 
     # 将图表转换为图片并展示在Streamlit中
-    plt_image = plt.gcf()  # 获取当前图表对象
+    plt_image = plt.gcf()
     st.pyplot(plt_image)
 
 if __name__ == "__main__":
     main()
+
+
+﻿
