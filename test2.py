@@ -1,65 +1,55 @@
-import random
+import streamlit as st
+from bs4 import BeautifulSoup
 import requests
 import re
 import jieba
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
-
-
-def get_video_id_from_url(url):
-    # 解析视频ID的逻辑，这取决于Bilibili的URL结构
-    # 这里只是一个示例，实际逻辑可能不同
-    video_id = re.search(r'BV(\w+)', url).group(1)  # 假设Bilibili的新链接格式是BVxxxxxx
-    return video_id
-
-
-def get_danmu_from_api(video_id, headers):
-    # 模拟从API获取弹幕数据的过程
-    danmu_data = [
-        "弹幕1", "弹幕2", "这是弹幕3", "中文字符弹幕", "又一个弹幕示例"
-    ]
-    return danmu_data
-
-def generate_wordcloud(danmu_text):
-    # 检查danmu_text是否为空
-    if not danmu_text or not danmu_text.strip():
-        print("没有有效的弹幕数据来生成词云。")
-        return
-
-    words = jieba.lcut(danmu_text)
-
-    # 随机化单词顺序（可选）
-    random.shuffle(words)
-
-
-    wordcloud = WordCloud(font_path='simhei.ttf',  # 设置字体文件路径，确保能够显示中文
-                      background_color='white',  # 设置背景颜色
-                      max_words=100,  # 最多显示的词数
-                      max_font_size=100  # 字体最大值
-                      ).generate(' '.join(words))
-
-# 显示词云图
-    plt.figure(figsize=(10, 8), facecolor=None)  # 创建一个绘图对象
-    plt.imshow(wordcloud)  # 显示词云图
-    plt.axis("off")  # 不显示坐标轴
-    plt.tight_layout(pad=0)  # 调整子图参数，使之填充整个图像区域
-    plt.show()  # 显示图像
-
+import numpy as np
 
 def main():
-    video_url = input("请输入Bilibili视频网址：")
-    video_id = get_video_id_from_url(video_url)
+    st.title('Bilibili DanMu Word Cloud')
+
+    # 用户输入oid
+    oid = st.text_input("请输入Bilibili视频的oid:")
+
+    # 检查用户是否输入了oid
+    if not oid:
+        st.error("没有输入oid，请重新输入！")
+        return
+
+    # 爬取网页源码
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36",
     }
-    danmu_data = get_danmu_from_api(video_id, headers)
-    if not danmu_data:
-        print("从API获取弹幕数据时出错或没有获取到任何数据。")
+    response = requests.get(f"https://api.bilibili.com/x/v1/dm/list.so?oid={oid}", headers=headers)
+    
+    # 如果请求失败，显示错误信息
+    if response.status_code != 200:
+        st.error(f"请求失败，状态码：{response.status_code}")
         return
-    print("获取到的弹幕数据（部分）：")
-    print(danmu_data[:10])  # 打印前10条弹幕，以便检查数据是否变化
-    danmu_text = ' '.join(danmu_data)  # 合并所有弹幕到一个字符串中
-    generate_wordcloud(danmu_text)  # 生成词云图
+    
+    html_doc = response.content.decode('utf-8')
+
+    # 弹幕匹配
+    format = re.compile(r'<d.*?>(.*?)</d>')
+    DanMu_list = format.findall(html_doc)
+
+    # 合并弹幕
+    DanMu_text = ' '.join(DanMu_list)
+
+    # 分词
+    words = jieba.lcut(DanMu_text)
+
+    # 生成词云图
+    wordcloud = WordCloud(font_path='SIMHEI.TTF', background_color='white', max_words=100, max_font_size=100).generate(' '.join(words))
+
+    # 显示词云图
+    fig = plt.figure(figsize=(10, 8), facecolor=None)
+    plt.imshow(wordcloud)
+    plt.axis("off")
+    plt.tight_layout(pad=0)
+    st.pyplot(fig)
 
 if __name__ == "__main__":
     main()
