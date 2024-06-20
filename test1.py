@@ -4,63 +4,49 @@ from bs4 import BeautifulSoup
 import jieba  
 from wordcloud import WordCloud  
 import matplotlib.pyplot as plt  
-import re  
-from io import BytesIO  
+from PIL import Image  
+import numpy as np  
   
-# 弹幕文本清洗函数  
-def clean_danmu(text):  
-    return re.sub(r'[^\u4e00-\u9fa5]', '', text)  
+# 假设你已经在本地或云端提供了'simsun.ttc'字体文件  
+FONT_PATH = 'simsun.ttc'  # 确保这个字体文件在你的应用目录中  
   
-# 生成词云的函数  
-def generate_wordcloud(danmu_list):  
-    # 合并所有弹幕文本  
-    danmustr = ' '.join(danmu_list)  
+def generate_wordcloud(txtsss):  
+    danmustr = ''.join(txtsss)  
+    words = list(jieba.cut(danmustr))  
+    words = [i for i in words if len(i) > 1]  
+    wc = WordCloud(height=1000, width=1000, font_path=FONT_PATH, background_color='white')  
+    wc.generate(' '.join(words))  
+    return wc  
+  
+def plot_wordcloud(wc):  
+    plt.figure(figsize=(10, 10), facecolor=None)  
+    plt.imshow(wc, interpolation="bilinear")  
+    plt.axis("off")  
+    plt.tight_layout(pad=0)  
       
-    # 生成词云  
-    font_path = 'simsun.ttc'  # 确保此字体文件在你的环境中可用  
-    wc = WordCloud(font_path=font_path, width=1000, height=1000, background_color='white')  
-    wc.generate(danmustr)  
-      
-    # 将词云转换为图像  
-    fig, ax = plt.subplots(figsize=(10, 10))  
-    ax.imshow(wc, interpolation='bilinear')  
-    ax.axis("off")  
-    buf = BytesIO()  
-    plt.savefig(buf, format="png")  
+    # 将matplotlib图像转换为PIL图像，以便在Streamlit中显示  
+    buf = io.BytesIO()  
+    plt.savefig(buf, format='png')  
     buf.seek(0)  
-      
-    # 返回图像  
-    return buf  
+    image = Image.open(buf)  
+    image = image.convert('RGB')  
+    return image  
   
-# Streamlit应用的主函数  
 def main():  
-    st.title("弹幕词云生成器")  
-      
-    # 假设的URL，可能需要替换  
     url = "https://comment.bilibili.com/1251331073.xml"  
-      
-    try:  
-        response = requests.get(url)  
-        response.raise_for_status()  # 检查响应状态码  
-        html = response.text  
-          
-        # 使用lxml解析XML  
-        soup = BeautifulSoup(html, 'lxml')  
-          
-        # 假设每个<d>标签包含弹幕文本  
-        all_txt = soup.find_all("d")  # 注意：这里可能需要根据你的XML结构进行调整  
-        txtss = [clean_danmu(all_txts.get_text(strip=True, separator=' ')) for all_txts in all_txt if all_txts.get_text(strip=True)]  
-          
-        # 生成词云图像  
-        image = generate_wordcloud(txtss)  
-          
-        # 显示词云图像  
-        st.image(image)  
-          
-    except requests.RequestException as e:  
-        st.error(f"网络请求错误: {e}")  
-    except Exception as e:  
-        st.error(f"发生错误: {e}")  
+    response = requests.get(url)  
+    response.encoding = 'utf-8'  
+    html = response.text  
+    soup = BeautifulSoup(html, "xml")  
+    all_txt = soup.findAll("d")  
+    txtss = [all_txts.string for all_txts in all_txt if all_txts.string]  # 确保只取有内容的字符串  
+    txtsss = [txts.replace(' ', '') for txts in txtss]  
+  
+    wc = generate_wordcloud(txtsss)  
+    image = plot_wordcloud(wc)  
+  
+    # 在Streamlit中显示词云  
+    st.image(image, caption='Bilibili Comment Word Cloud')  
   
 if __name__ == "__main__":  
     main()
