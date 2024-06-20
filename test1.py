@@ -37,7 +37,7 @@ def main():
     response = requests.get(url)  
     response.encoding = 'utf-8'  
     html = response.text  
-    soup = BeautifulSoup(html, "xml")  
+    soup = BeautifulSoup(html, "lxml")  # 或者 "html.parser"
     all_txt = soup.findAll("d")  
     txtss = [all_txts.string for all_txts in all_txt if all_txts.string]  # 确保只取有内容的字符串  
     txtsss = [txts.replace(' ', '') for txts in txtss]  
