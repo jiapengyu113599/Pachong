@@ -28,7 +28,7 @@ def main():
     words = jieba.lcut(DanMu_text)
 
     # 生成词云图
-    wordcloud = WordCloud(font_path='simhei.ttf', background_color='white', max_words=100, max_font_size=100).generate(' '.join(words))
+    wordcloud = WordCloud(font_path='SIMHEI.TTF', background_color='white', max_words=100, max_font_size=100).generate(' '.join(words))
 
     # 显示词云图
     fig = plt.figure(figsize=(10, 8), facecolor=None)
